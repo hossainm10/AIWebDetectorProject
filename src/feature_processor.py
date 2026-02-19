@@ -1,4 +1,4 @@
-from urlib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 import re
 import math
 from collections import Counter
@@ -50,8 +50,8 @@ class FeatureCollector:
 
             scheme=parsed.scheme
             domain=parsed.netloc
-            path=parsed.query
-            fragment=parsed.fragment
+            query=parsed.query
+            path=parsed.path
 
         except Exception as e:
             print(f"Counldn't parse Url: {url} with error {e}")

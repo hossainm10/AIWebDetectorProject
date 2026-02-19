@@ -12,9 +12,6 @@ Key Concepts:
 - Isolation Forest: Algorithm that isolates anomalies instead of profiling normal
 - Feature Scaling: Normalizes features so they have equal importance
 - Anomaly Score: How "different" something is from normal (-1 to 1)
-
-Author: Your Name
-Date: 2025
 """
 
 import numpy as np

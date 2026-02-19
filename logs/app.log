@@ -1,0 +1,10 @@
+2026-02-18 21:22:08,393 - test_logger - INFO - This is an INFO message (green)
+2026-02-18 21:22:08,394 - test_logger - WARNING - This is a WARNING message (yellow)
+2026-02-18 21:22:08,394 - test_logger - ERROR - This is an ERROR message (red)
+2026-02-18 21:22:08,394 - test_logger - CRITICAL - This is a CRITICAL message (bold red)
+Debug message - visible
+Info message - visible
+Warning message - visible
+2026-02-18 21:22:08,397 - test_logger - INFO - Starting: Example task
+2026-02-18 21:22:09,399 - test_logger - INFO - Completed: Example task (took 1.00s)
+2026-02-18 21:22:09,901 - test_logger - INFO - Heavy computation completed in 0.50s

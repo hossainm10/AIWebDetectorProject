@@ -23,8 +23,6 @@ Usage:
     # Analyze with custom config
     python main.py --url https://site.com --config config/prod.yaml
 
-Author: Your Name
-Date: 2025
 """
 
 import sys
@@ -39,7 +37,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'data'))
 
 # Import all components
 from browser_collector import BrowserCollector
-from feature_collector import FeatureCollector
+from feature_processor import FeatureCollector
 from anomaly_model import AnomalyDetector
 from analyzer import RuleBasedAnalyzer
 from crawler import WebCrawler, get_popular_websites

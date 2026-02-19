@@ -16,8 +16,7 @@ Why separate output module?
 - Separates presentation from logic
 - Reusable formatting functions
 
-Author: Your Name
-Date: 2025
+
 """
 
 import json

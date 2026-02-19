@@ -16,8 +16,6 @@ Why validate inputs?
 - Data integrity
 - Clear error messages
 
-Author: Your Name
-Date: 2025
 """
 
 import re
