@@ -16,8 +16,7 @@ Why proper logging?
 - Audit trail of actions
 - Performance monitoring
 
-Author: Your Name
-Date: 2025
+
 """
 
 import logging
