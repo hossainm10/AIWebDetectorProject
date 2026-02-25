@@ -1,41 +1,14 @@
-"""
-Main Application Entry Point
-=============================
-Orchestrates the entire browser activity analysis system.
 
-This is the central hub that coordinates:
-1. Loading configuration
-2. Initializing all components
-3. Training or loading ML model
-4. Analyzing URLs
-5. Generating reports
-
-Usage:
-    # Analyze single URL
-    python main.py --url https://suspicious-site.com
-    
-    # Analyze URL list
-    python main.py --file urls.txt
-    
-    # Train model first
-    python main.py --train --samples 100
-    
-    # Analyze with custom config
-    python main.py --url https://site.com --config config/prod.yaml
-
-"""
 
 import sys
 import os
 import argparse
 from datetime import datetime
 
-# Add src and utils to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'utils'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'data'))
 
-# Import all components
 from browser_collector import BrowserCollector
 from feature_processor import FeatureCollector
 from anomaly_model import AnomalyDetector
@@ -48,48 +21,18 @@ from validators import validate_url, ValidationError
 
 
 class BrowserActivityAnalyzer:
-    """
-    Main application class that coordinates all components.
-    
-    This class is the "conductor" that:
-    - Initializes all modules
-    - Manages application state
-    - Coordinates analysis workflow
-    - Handles errors gracefully
-    
-    Attributes:
-        config: Configuration object
-        logger: Logger instance
-        browser: BrowserCollector instance
-        features: FeatureCollector instance
-        ml_detector: AnomalyDetector instance
-        rule_analyzer: RuleBasedAnalyzer instance
-        output: OutputFormatter instance
-    """
     
     def __init__(self, config_file=None, environment='prod'):
-        """
-        Initialize the analyzer application.
-        
-        Args:
-            config_file (str): Path to config file
-            environment (str): Environment (dev, test, prod)
-        
-        Example:
-            app = BrowserActivityAnalyzer('config/settings.yaml', 'prod')
-            app.setup()
-            result = app.analyze_url('https://example.com')
-        """
         
         print("=" * 70)
         print("BROWSER ACTIVITY ANALYZER")
         print("=" * 70)
         print(f"Initializing... (environment: {environment})")
         
-        # ===== LOAD CONFIGURATION =====
+        
         self.config = Config(config_file, environment)
         
-        # ===== SETUP LOGGING =====
+    
         self.logger = setup_logger(
             __name__,
             config=self.config.get('logging')
@@ -97,45 +40,22 @@ class BrowserActivityAnalyzer:
         
         self.logger.info("Application initialized")
         
-        # ===== INITIALIZE COMPONENTS =====
-        # These will be set up in setup() method
+        
         self.browser = None
         self.features = None
         self.ml_detector = None
         self.rule_analyzer = None
         self.output = None
         
-        # Track if components are ready
+        
         self.is_ready = False
     
     def setup(self, train_if_needed=True):
-        """
-        Set up all application components.
-        
-        This method:
-        1. Initializes browser automation
-        2. Creates feature extractor
-        3. Loads or trains ML model
-        4. Sets up rule-based analyzer
-        5. Configures output formatter
-        
-        Args:
-            train_if_needed (bool): Train model if not found
-        
-        Returns:
-            bool: True if setup successful
-        
-        Example:
-            app = BrowserActivityAnalyzer()
-            if app.setup():
-                # Ready to analyze
-                result = app.analyze_url('https://example.com')
-        """
-        
+       
         self.logger.info("Setting up components...")
         
         try:
-            # ===== STEP 1: BROWSER =====
+          
             self.logger.info("[1/5] Initializing browser...")
             
             self.browser = BrowserCollector(
@@ -148,13 +68,13 @@ class BrowserActivityAnalyzer:
             
             self.logger.info("✓ Browser ready")
             
-            # ===== STEP 2: FEATURE COLLECTOR =====
+           
             self.logger.info("[2/5] Creating feature collector...")
             
             self.features = FeatureCollector()
             self.logger.info("✓ Feature collector ready")
             
-            # ===== STEP 3: ML MODEL =====
+    
             self.logger.info("[3/5] Loading ML model...")
             
             self.ml_detector = AnomalyDetector(
@@ -162,7 +82,7 @@ class BrowserActivityAnalyzer:
                 random_state=self.config.get('model', 'random_state')
             )
             
-            # Try to load existing model
+         
             model_path = os.path.join(
                 self.config.get('paths', 'models_dir'),
                 'anomaly_detector.pkl'
@@ -181,14 +101,13 @@ class BrowserActivityAnalyzer:
                 else:
                     self.logger.warning("Continuing without ML detection")
             
-            # ===== STEP 4: RULE ANALYZER =====
+        
             self.logger.info("[4/5] Setting up rule-based analyzer...")
             
             self.rule_analyzer = RuleBasedAnalyzer()
             self.logger.info("✓ Rule analyzer ready")
             
             
-            # ===== STEP 5: OUTPUT FORMATTER =====
             self.logger.info("[5/5] Setting up output formatter...")
             
             self.output = OutputFormatter(
@@ -196,7 +115,7 @@ class BrowserActivityAnalyzer:
             )
             self.logger.info("✓ Output formatter ready")
             
-            # Mark as ready
+           
             self.is_ready = True
             self.logger.info("✓ All components ready!")
             
@@ -207,25 +126,18 @@ class BrowserActivityAnalyzer:
             return False
     
     def _train_model(self):
-        """
-        Train ML model using collected data.
-        
-        Returns:
-            bool: True if training successful
-        """
+  
         
         self.logger.info("Collecting training data...")
         
-        # Get target sample count
+
         target_samples = self.config.get('model', 'target_training_samples')
         
-        # Create crawler
+    
         crawler = WebCrawler(self.browser, self.features)
         
-        # Get normal website URLs
         urls = get_popular_websites('general', target_samples)
         
-        # Collect data
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         data_file = os.path.join(
             self.config.get('paths', 'training_dir'),
@@ -234,10 +146,8 @@ class BrowserActivityAnalyzer:
         
         summary = crawler.crawl_url_list(urls, data_file)
         
-        # Get feature vectors
         vectors = crawler.get_feature_vectors()
         
-        # Check if we have enough samples
         min_samples = self.config.get('model', 'min_training_samples')
         if len(vectors) < min_samples:
             self.logger.error(
@@ -246,14 +156,13 @@ class BrowserActivityAnalyzer:
             )
             return False
         
-        # Train model
         self.logger.info(f"Training model on {len(vectors)} samples...")
         
         if not self.ml_detector.train(vectors):
             self.logger.error("Model training failed")
             return False
         
-        # Save model
+        
         model_path = os.path.join(
             self.config.get('paths', 'models_dir'),
             'anomaly_detector.pkl'
@@ -265,36 +174,12 @@ class BrowserActivityAnalyzer:
         return True
     
     def analyze_url(self, url):
-        """
-        Analyze a single URL for suspicious activity.
-        
-        This is the main analysis method that:
-        1. Validates URL
-        2. Visits page with browser
-        3. Extracts features
-        4. Runs ML detection
-        5. Runs rule-based analysis
-        6. Combines results
-        7. Determines final verdict
-        
-        Args:
-            url (str): URL to analyze
-        
-        Returns:
-            dict: Complete analysis results
-        
-        Example:
-            result = app.analyze_url('https://suspicious-site.com')
-            print(f"Risk Level: {result['rule_analysis']['risk_level']}")
-            print(f"Verdict: {result['final_verdict']}")
-        """
         
         if not self.is_ready:
             raise RuntimeError("Application not initialized. Call setup() first.")
         
         self.logger.info(f"Analyzing URL: {url}")
         
-        # ===== STEP 1: VALIDATE URL =====
         is_valid, error = validate_url(url)
         if not is_valid:
             self.logger.error(f"Invalid URL: {error}")
@@ -304,7 +189,6 @@ class BrowserActivityAnalyzer:
                 'final_verdict': 'INVALID URL'
             }
         
-        # ===== STEP 2: VISIT PAGE =====
         self.logger.info("Visiting page...")
         
         visit_data = self.browser.visit_url(url)
@@ -316,7 +200,6 @@ class BrowserActivityAnalyzer:
                 'final_verdict': 'ANALYSIS FAILED'
             }
         
-        # ===== STEP 3: EXTRACT FEATURES =====
         self.logger.info("Extracting features...")
         
         feature_vector, feature_dict = self.features.extract_all_features(
@@ -327,7 +210,6 @@ class BrowserActivityAnalyzer:
         
         self.logger.info(f"Extracted {len(feature_vector)} features")
         
-        # ===== STEP 4: ML DETECTION =====
         ml_result = None
         
         if self.ml_detector.is_trained and self.config.get('analyzer', 'enable_ml'):
@@ -341,7 +223,6 @@ class BrowserActivityAnalyzer:
         else:
             self.logger.info("ML detection skipped (not enabled or not trained)")
         
-        # ===== STEP 5: RULE-BASED ANALYSIS =====
         rule_result = None
         
         if self.config.get('analyzer', 'enable_rules'):
@@ -355,12 +236,10 @@ class BrowserActivityAnalyzer:
         else:
             self.logger.info("Rule-based analysis skipped (not enabled)")
         
-        # ===== STEP 6: DETERMINE FINAL VERDICT =====
         final_verdict = self._determine_verdict(ml_result, rule_result)
         
         self.logger.info(f"Final Verdict: {final_verdict}")
         
-        # ===== STEP 7: BUILD RESULT =====
         result = {
             'url': url,
             'timestamp': datetime.now().isoformat(),
@@ -374,31 +253,15 @@ class BrowserActivityAnalyzer:
         return result
     
     def _determine_verdict(self, ml_result, rule_result):
-        """
-        Combine ML and rule-based results into final verdict.
+       
         
-        Decision logic:
-        - Both say dangerous → MALICIOUS - High Confidence
-        - ML says anomaly, rules say risky → SUSPICIOUS - High Confidence
-        - One says dangerous → SUSPICIOUS - Medium Confidence
-        - Both say safe → SAFE
-        
-        Args:
-            ml_result (dict): ML detection results
-            rule_result (dict): Rule-based analysis results
-        
-        Returns:
-            str: Final verdict
-        """
-        
-        # Extract key indicators
+       
         ml_anomaly = ml_result.get('is_anomaly', False) if ml_result else False
         ml_confidence = ml_result.get('confidence', 0) if ml_result else 0
         
         risk_level = rule_result.get('risk_level', 'UNKNOWN') if rule_result else 'UNKNOWN'
         risk_score = rule_result.get('risk_score', 0) if rule_result else 0
-        
-        # Decision tree
+ 
         if ml_anomaly and risk_level == 'HIGH':
             return 'MALICIOUS - High Confidence'
         
@@ -418,24 +281,7 @@ class BrowserActivityAnalyzer:
             return 'INCONCLUSIVE - Manual Review Recommended'
     
     def analyze_url_list(self, urls, save_report=True):
-        """
-        Analyze multiple URLs.
-        
-        Args:
-            urls (list): List of URLs to analyze
-            save_report (bool): Save results to file
-        
-        Returns:
-            list: List of analysis results
-        
-        Example:
-            urls = ['https://site1.com', 'https://site2.com']
-            results = app.analyze_url_list(urls)
-            
-            # Print summary
-            for result in results:
-                print(f"{result['url']}: {result['final_verdict']}")
-        """
+       
         
         self.logger.info(f"Analyzing {len(urls)} URLs...")
         
@@ -456,31 +302,22 @@ class BrowserActivityAnalyzer:
                     'final_verdict': 'ANALYSIS FAILED'
                 })
         
-        # Save batch report
         if save_report:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             
-            # JSON report
             json_file = self.output.save_json(
                 results,
                 f'batch_analysis_{timestamp}.json'
             )
             self.logger.info(f"Batch report saved: {json_file}")
             
-            # Print summary
+          
             self.output.print_batch_summary(results)
         
         return results
     
     def cleanup(self):
-        """
-        Clean up resources.
-        
-        Always call this when done to:
-        - Close browser
-        - Save any pending data
-        - Release resources
-        """
+
         
         self.logger.info("Cleaning up...")
         
@@ -490,29 +327,9 @@ class BrowserActivityAnalyzer:
         self.logger.info("✓ Cleanup complete")
 
 
-# =========================================================================
-# COMMAND LINE INTERFACE
-# =========================================================================
 
 def main():
-    """
-    Main function for command-line usage.
-    
-    Examples:
-        # Analyze single URL
-        python main.py --url https://suspicious-site.com
-        
-        # Analyze URL list
-        python main.py --file urls.txt
-        
-        # Train model
-        python main.py --train --samples 100
-        
-        # Use custom config
-        python main.py --url https://site.com --config config/prod.yaml
-    """
-    
-    # Parse command line arguments
+   
     parser = argparse.ArgumentParser(
         description='AI-Powered Browser Activity Analyzer',
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -532,7 +349,7 @@ Examples:
         """
     )
     
-    # Mode selection
+  
     parser.add_argument(
         '--url',
         help='Single URL to analyze'
@@ -549,7 +366,7 @@ Examples:
         help='Train ML model before analyzing'
     )
     
-    # Configuration
+    
     parser.add_argument(
         '--config',
         help='Path to config file (YAML or JSON)'
@@ -562,15 +379,13 @@ Examples:
         help='Environment (default: prod)'
     )
     
-    # Training options
+   
     parser.add_argument(
         '--samples',
         type=int,
         default=100,
         help='Number of training samples to collect (default: 100)'
     )
-    
-    # Output options
     parser.add_argument(
         '--output',
         help='Output file for results'
@@ -590,31 +405,23 @@ Examples:
     )
     
     args = parser.parse_args()
-    
-    # Validate arguments
     if not args.url and not args.file and not args.train:
         parser.error('Must specify --url, --file, or --train')
-    
-    # ===== INITIALIZE APPLICATION =====
     try:
         app = BrowserActivityAnalyzer(
             config_file=args.config,
             environment=args.env
         )
-        
-        # Override config with command line args
         if args.verbose:
             app.config.set('logging', 'level', value='DEBUG')
         
-        # Setup components
+        
         if not app.setup(train_if_needed=args.train):
             print("✗ Setup failed")
             return 1
         
-        # ===== EXECUTE REQUESTED ACTION =====
         
         if args.train:
-            # Training mode
             print("\n" + "=" * 70)
             print("TRAINING ML MODEL")
             print("=" * 70)
@@ -626,17 +433,14 @@ Examples:
                 return 1
         
         if args.url:
-            # Single URL analysis
             print("\n" + "=" * 70)
             print("ANALYZING SINGLE URL")
             print("=" * 70)
             
             result = app.analyze_url(args.url)
             
-            # Display result
             app.output.print_analysis_summary(result)
             
-            # Save if requested
             if args.output:
                 if args.format == 'json':
                     app.output.save_json(result, args.output)
@@ -646,12 +450,12 @@ Examples:
                 print(f"\n✓ Results saved to: {args.output}")
         
         elif args.file:
-            # Batch URL analysis
+          
             print("\n" + "=" * 70)
             print("BATCH URL ANALYSIS")
             print("=" * 70)
             
-            # Load URLs from file
+       
             with open(args.file, 'r') as f:
                 urls = [line.strip() for line in f if line.strip()]
             

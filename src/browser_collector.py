@@ -1,6 +1,3 @@
-"""
-Browser Collector Module - Minimal Working Version
-"""
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -15,7 +12,6 @@ from datetime import datetime
 
 
 class BrowserCollector:
-    """Manages browser automation for data collection."""
     
     def __init__(self, headless=True):
         self.driver = None
@@ -23,7 +19,6 @@ class BrowserCollector:
         self.session_history = []
         
     def initialize_browser(self):
-        """Set up Chrome browser with Selenium."""
         print("Initializing Chrome browser...")
         
         chrome_options = Options()
@@ -117,23 +112,16 @@ class BrowserCollector:
             print("✓ Browser closed")
 
 
-# ===== TEST CODE =====
 if __name__ == "__main__":
     print("=" * 70)
     print("BROWSER COLLECTOR - TEST MODE")
     print("=" * 70)
-    
-    # Step 1: Create collector
     print("\n[1] Creating BrowserCollector...")
     collector = BrowserCollector(headless=False)
-    
-    # Step 2: Initialize browser
     print("\n[2] Initializing browser...")
     if not collector.initialize_browser():
         print("✗ Setup failed")
         exit(1)
-    
-    # Step 3: Test URLs
     test_urls = [
         'https://www.google.com',
         'https://www.github.com',
@@ -150,8 +138,6 @@ if __name__ == "__main__":
         if result:
             successful += 1
         time.sleep(2)
-    
-    # Step 4: Display summary
     print("\n" + "=" * 70)
     print("SESSION SUMMARY")
     print("=" * 70)
@@ -166,8 +152,6 @@ if __name__ == "__main__":
     if summary['first_visit']:
         print(f"First visit: {summary['first_visit']}")
         print(f"Last visit: {summary['last_visit']}")
-    
-    # Step 5: Cleanup
     print("\n[4] Closing browser...")
     collector.close_browser()
     

@@ -1,8 +1,3 @@
-"""
-Web Crawler Module
-==================
-Automated data collection for training the anomaly detection model.
-"""
 
 import sys
 import os
@@ -12,15 +7,13 @@ from datetime import datetime
 from urllib.parse import urlparse
 import random
 
-# ===== FIX IMPORTS =====
-# Get current directory and project root
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 
-# Add src directory to Python path
+
 sys.path.insert(0, os.path.join(project_root, 'src'))
 
-# Import after fixing path
+
 try:
     from browser_collector import BrowserCollector
     from feature_processor import FeatureCollector
@@ -336,7 +329,7 @@ def get_popular_websites(category='general', count=50):
     return url_list[:count]
 
 
-# ===== TEST CODE =====
+
 if __name__ == "__main__":
     print("=" * 70)
     print("WEB CRAWLER - TEST MODE")
@@ -354,7 +347,7 @@ if __name__ == "__main__":
     print("\n[TEST 2] Simulate Crawler Configuration")
     print("-" * 70)
     
-    # Mock objects for testing without actual browser
+ 
     class MockBrowser:
         def visit_url(self, url):
             return {'url': url, 'timestamp': time.time(), 'title': 'Test', 'load_time': 1.0}

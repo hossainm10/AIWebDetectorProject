@@ -1,8 +1,4 @@
-"""
-Training Data Collection Driver
-================================
-Orchestrates the complete training data collection process.
-"""
+
 
 import sys
 import os
@@ -12,40 +8,37 @@ from datetime import datetime
 
 
 def setup_paths():
-    """Add project directories to Python path."""
-    # Get absolute path to this file
+     
     current_file = os.path.abspath(__file__)
     current_dir = os.path.dirname(current_file)
     project_root = os.path.dirname(current_dir)
     
-    # Add directories
+    
     src_dir = os.path.join(project_root, 'src')
     utils_dir = os.path.join(project_root, 'utils')
     data_dir = os.path.join(project_root, 'data')
     
-    # Add to path if not already there
+   
     for directory in [src_dir, utils_dir, data_dir]:
         if directory not in sys.path:
             sys.path.insert(0, directory)
     
     return src_dir, utils_dir, data_dir
 
-# Setup paths before importing
+
 src_dir, utils_dir, data_dir = setup_paths()
 
-# Debug: Print what we're doing
 print(f"DEBUG: Adding to Python path:")
 print(f"  src: {src_dir}")
 print(f"  Exists: {os.path.exists(src_dir)}")
 print(f"  browser_collector.py exists: {os.path.exists(os.path.join(src_dir, 'browser_collector.py'))}")
 
-# Now try importing
+
 try:
     import browser_collector
-    import feature_processor  # Using  actual filename
+    import feature_processor  
     import crawler
     
-    # Get the classes
     BrowserCollector = browser_collector.BrowserCollector
     FeatureCollector = feature_processor.FeatureCollector
     WebCrawler = crawler.WebCrawler
